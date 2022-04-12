@@ -1,9 +1,9 @@
 package testingListeners.logging
 
-class Logger4stdout {
+class Logger4qaseio {
     companion object {
         fun log(message: String) {
-            println("\t\tSTDOUT: $message")
+            println("\t\tQASEIO: $message")
         }
     }
 }

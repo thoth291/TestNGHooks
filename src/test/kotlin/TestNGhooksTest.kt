@@ -1,5 +1,6 @@
 import org.testng.Assert.assertEquals
 import org.testng.annotations.Test
+import org.testng.xml.dom.Tag
 
 /**
  *  They can be added to testng.xml like this
@@ -14,7 +15,8 @@ import org.testng.annotations.Test
 
 class TestNGhooksTest : TestBase() {
 
-    @Test
+    @Tag(name = "happy")
+    @Test(description = "Happy Test", parameters = arrayOf("pH","pT"), groups = arrayOf("gH","gT"))
     fun happyTest() {
         val expected = 10
         val result = 5+5
