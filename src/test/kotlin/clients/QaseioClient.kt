@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 
 import io.restassured.RestAssured.given
+import io.restassured.http.ContentType
 import org.hamcrest.Matchers.*
 
 import java.nio.file.Files
@@ -27,12 +28,24 @@ data class Config(
     val qaseio: ProductProperties?
 )
 
+data class AttachmentResult(
+    val total: Int,
+    val filtered: Int,
+    val count: Int,
+    val entities: List<Any?>?
+)
+
+data class AttachmentResponse(
+    val status: Boolean,
+    val result: AttachmentResult
+)
+
 class QaseioClient {
 
     lateinit var accessToken: String
 
     fun getConfig(): Config? {
-        val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule())
+        val mapper = ObjectMapper(YAMLFactory()).registerModule(KotlinModule.Builder().build())
         val file = Files.newBufferedReader(Paths.get("src/test/resources/application.yaml"))
 
         return try {
@@ -46,7 +59,7 @@ class QaseioClient {
         }
     }
 
-    fun setupClient(){
+    fun setupClient(): AttachmentResponse? {
 
         val config = getConfig()
         accessToken = config!!.qaseio?.api_token_key.toString()
@@ -63,18 +76,22 @@ class QaseioClient {
         }
          * */
 
-        given()
-            .param("limit","10")
-            .param("offset","0")
-            .header("Accept", "application/json")
+        val response = given()
+            .param("limit", "10")
+            .param("offset", "0")
+            .header("Accept", ContentType.JSON)
             .header("Token", accessToken)
-        .`when`()
+            .`when`()
             .get("https://api.qase.io/v1/attachment")
-        .then()
+            .then()
+            .contentType(ContentType.JSON)
             .log().all()
             .statusCode(200)
-            .body("status",equalTo(true))
+            .body("status", equalTo(true))
             .body("result", notNullValue())
+            .extract().response()
+
+        return response.`as`(AttachmentResponse::class.java)
 
     }
 
