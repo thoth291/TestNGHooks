@@ -28,6 +28,23 @@ class Listener4Qaseio : TestListenerAdapter() {
         super.onTestSuccess(result)
         if (result != null) {
             Logger4Qaseio.log("<<<=== Test completed successfully: ${result.name}")
+            Logger4Qaseio.log("<<<<<<=== Test Description: ${result.method.description}")
+            Logger4Qaseio.log("<<<<<<<<<==== Test Groups: ${result.method.groups.joinToString(
+                prefix = "[ ",
+                separator = ", ",
+                postfix = " ]",
+                limit = 10,
+                truncated = "...",
+                transform = { it }
+            ) }")
+            Logger4Qaseio.log("<<<<<<<<<<<<==== Test Parameters: ${result.parameters.joinToString(
+                prefix = "[ ",
+                separator = ", ",
+                postfix = " ]",
+                limit = 10,
+                truncated = "...",
+                transform = { it -> it.toString() }
+            )}")
         }
     }
     override fun onTestFailure(result: ITestResult) {
